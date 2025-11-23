@@ -1,4 +1,4 @@
-#📚 Proyecto MongoDB – Análisis de Catálogo de Netflix
+📚 Proyecto MongoDB – Análisis de Catálogo de Netflix
 
 Este proyecto implementa una base de datos NoSQL utilizando MongoDB, aplicando operaciones CRUD, consultas avanzadas y agregaciones sobre un dataset real de películas y series de Netflix, obtenido de Kaggle.
 
