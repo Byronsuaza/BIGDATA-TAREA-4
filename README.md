@@ -1,37 +1,50 @@
-📚 Proyecto MongoDB – Análisis de Catálogo de Netflix
+# 📘 Proyecto MongoDB – Análisis de Catálogo de Netflix
 
-Este proyecto implementa una base de datos NoSQL utilizando MongoDB, aplicando operaciones CRUD, consultas avanzadas y agregaciones sobre un dataset real de películas y series de Netflix, obtenido de Kaggle.
+Este proyecto implementa una base de datos NoSQL utilizando MongoDB para almacenar, consultar y analizar un catálogo de películas y series provenientes del dataset **Netflix Movies and TV Shows**.
 
-El objetivo es demostrar el diseño, carga, manipulación y análisis de datos dentro de un entorno MongoDB, siguiendo las fases solicitadas en el trabajo académico.
+El objetivo es aplicar operaciones CRUD, consultas avanzadas, filtros y agregaciones, como parte del desarrollo académico.
 
-📁 Contenido del repositorio
-📁 Proyecto-MongoDB  
+---
+
+## 📁 Contenido del Repositorio
+
+```
+Proyecto-MongoDB/
 │── README.md
 │── mongodb_comandos_explicados.txt
 │── netflix_titles.csv
 
+```
 
-🧩 1. Diseño de la Base de Datos
-✔ Caso de uso
+---
 
-El caso de uso seleccionado es un catálogo de contenido audiovisual, como el utilizado por plataformas tipo Netflix. Este escenario es ideal para una base de datos NoSQL debido a:
+# 1. Diseño de la Base de Datos
 
-La estructura flexible de los datos (no todos los títulos tienen los mismos campos).
+## 1.1 Caso de uso seleccionado
 
-Presencia de listas o valores múltiples (cast, países, géneros).
+El caso de uso es un **catálogo de contenido audiovisual**, ideal para MongoDB por:
 
-Necesidad de consultas rápidas, escalabilidad y almacenamiento de documentos heterogéneos.
+* Estructuras flexibles (no todos los registros tienen los mismos campos)
+* Campos multivaluados (cast, géneros, países)
+* Manejo eficiente de grandes volúmenes de datos
+* Consultas rápidas y escalables
 
-✔ Base de datos utilizada
-universidad
+---
 
-✔ Colección principal
-estudiante
+## 1.2 Base de datos y colección
 
-✔ Estructura del documento (esquema lógico)
+| Elemento      | Nombre        |
+| ------------- | ------------- |
+| Base de datos | `universidad` |
+| Colección     | `estudiante`  |
 
-Cada documento contiene información como:
+---
 
+## 1.3 Esquema lógico del documento
+
+Cada documento almacena información como:
+
+```json
 {
   "show_id": "s1",
   "type": "Movie",
@@ -43,89 +56,126 @@ Cada documento contiene información como:
   "rating": "PG-13",
   "duration": "90 min",
   "listed_in": "Documentaries",
-  "description": "Short description…"
+  "description": "Short description..."
 }
+```
 
-🛠️ 2. Implementación en MongoDB
-✔ Inserción de datos
+---
 
-Se importaron 8807 documentos en la colección estudiante a través de MongoDB Compass usando el dataset de Kaggle.
+# 2. Implementación en MongoDB
 
-También se realizaron inserciones manuales mediante insertOne e insertMany.
+La base de datos fue creada e importada mediante **MongoDB Compass**, cargando **8807 documentos** del dataset.
 
-✔ Comandos utilizados
+Adicionalmente, se realizaron inserciones manuales, consultas y agregaciones mediante **MongoSH**.
 
-Todos los comandos ejecutados se encuentran documentados en:
+---
 
-📄 mongodb_comandos_explicados.txt
+## 2.1 Operaciones CRUD (Mongo Shell)
 
-Incluyen:
+### Insertar documentos (insertMany)
 
-Inserción de datos
+```js
+db.estudiante.insertMany([
+  { show_id: "t10000", type: "Movie", title: "Demo Movie", release_year: 2023 },
+  { show_id: "t10001", type: "TV Show", title: "Demo Series", release_year: 2021 }
+])
+```
 
-Consultas básicas
+### Consultar documentos
 
-Consultas con filtros y operadores
+```js
+db.estudiante.find().limit(5)
+```
 
-Actualizaciones y eliminaciones
+### Actualizar documentos
 
-Consultas de agregación
+```js
+db.estudiante.updateOne(
+  { show_id: "t20000" },
+  { $set: { title: "Updated Movie Example" } }
+)
+```
 
-Ejemplo de consulta de agregación:
+### Eliminar documentos
 
+```js
+db.estudiante.deleteOne({ show_id: "t20000" })
+```
+
+---
+
+## 2.2 Consultas con filtros
+
+```js
+db.estudiante.find({ release_year: 2020 })
+db.estudiante.find({ rating: "TV-MA" })
+db.estudiante.find({ release_year: { $gt: 2020 } })
+db.estudiante.find({ country: { $in: ["United States", "Canada"] } })
+```
+
+---
+
+## 2.3 Consultas de agregación
+
+### Contar películas y series
+
+```js
 db.estudiante.aggregate([
   { $group: { _id: "$type", total: { $sum: 1 } } }
 ])
+```
 
-📊 3. Consultas de Agregación y Análisis
-✔ Cantidad de películas y series
+### Promedio del año de lanzamiento
 
-Permite conocer la distribución del catálogo.
+```js
+db.estudiante.aggregate([
+  { $group: { _id: null, promedio: { $avg: "$release_year" } } }
+])
+```
 
-✔ Promedio del año de lanzamiento
+### Top 5 países con más títulos
 
-Mide la antigüedad promedio del contenido.
+```js
+db.estudiante.aggregate([
+  { $group: { _id: "$country", total: { $sum: 1 } } },
+  { $sort: { total: -1 } },
+  { $limit: 5 }
+])
+```
 
-✔ Top 5 países con más títulos
+### Categorías más comunes
 
-Revela los países más representados.
+```js
+db.estudiante.aggregate([
+  { $group: { _id: "$listed_in", total: { $sum: 1 } } },
+  { $sort: { total: -1 } },
+  { $limit: 10 }
+])
+```
 
-✔ Categorías más frecuentes
+---
 
-Ayuda a conocer el enfoque de contenido de la plataforma.
+# 3. Resultados del análisis
 
-Todos los resultados están explicados de forma detallada en el documento de comandos.
+* El catálogo contiene una mayor proporción de películas comparado con series.
+* Estados Unidos e India son los países con más títulos.
+* Los géneros predominantes incluyen dramas, comedias y documentales.
+* La mayoría del contenido fue producido en los últimos 20 años.
 
-🧪 4. Resultados Principales
+---
 
-Entre los principales hallazgos:
+# 4. Tecnologías utilizadas
 
-Hay más películas que series en el catálogo.
+* MongoDB Compass
+* MongoSH
+* JavaScript para consultas
+* Dataset de Kaggle
+* GitHub
 
-Estados Unidos e India son los países con mayor producción.
+---
 
-Los géneros más comunes incluyen:
-Drama, Comedia, Documentaries.
+# 5. Autor
 
-El promedio de año de lanzamiento está concentrado en las últimas dos décadas.
+**Byron Falla Suaza**
+Proyecto académico — UNAD (Universidad Nacional Abierta y a Distancia)
 
-Estos resultados muestran la utilidad del modelo NoSQL para análisis rápidos sobre grandes volúmenes de datos documentales.
-
-🚀 5. Tecnologías utilizadas
-
-MongoDB Community / MongoDB Compass
-
-MongoSH (Mongo Shell)
-
-Dataset de Kaggle – Netflix Movies and TV Shows
-
-GitHub para documentación y control de versiones
-
-📝 6. Autor
-
-Byron Eduardo Falla Suaza
-Proyecto académico para la Universidad Nacional Abierta y a Distancia (UNAD).
-
-📌 7. Licencia
-
-Este proyecto es de uso educativo. Puedes modificarlo, distribuirlo o reutilizarlo con fines académicos.
