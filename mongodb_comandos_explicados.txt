@@ -1,0 +1,67 @@
+Comandos de MongoDB con Explicación (Español)
+
+1.  Insertar múltiples documentos: db.estudiante.insertMany([ { show_id:
+    “t10000”, type: “Movie”, title: “Demo Movie”, release_year: 2023 },
+    { show_id: “t10001”, type: “TV Show”, title: “Demo Series”,
+    release_year: 2021 }])
+
+-   Inserta varios documentos de ejemplo dentro de la colección
+    ‘estudiante’.
+
+2.  Insertar un documento: db.estudiante.insertOne({ show_id: “t20000”,
+    type: “Movie”, title: “Example Insert”, release_year: 2022 })
+
+-   Inserta un único documento en la colección.
+
+3.  Consultar documentos: db.estudiante.find().limit(5)
+
+-   Recupera los primeros 5 documentos almacenados.
+
+4.  Actualizar un documento: db.estudiante.updateOne( { show_id:
+    “t20000” }, { $set: { title: “Updated Movie Example” } } )
+
+-   Actualiza el campo ‘title’ del documento cuyo ‘show_id’ coincide con
+    ‘t20000’.
+
+5.  Eliminar un documento: db.estudiante.deleteOne({ show_id: “t20000”
+    })
+
+-   Elimina el documento que tenga el ‘show_id’ indicado.
+
+6.  Filtro: Películas del año 2020: db.estudiante.find({ release_year:
+    2020 })
+
+-   Muestra todos los documentos con año de lanzamiento igual a 2020.
+
+7.  Filtros con operadores: db.estudiante.find({ release_year: { $gt:
+    2020 } })
+
+-   Muestra los documentos cuyo año de lanzamiento sea mayor a 2020.
+
+8.  Operador IN: db.estudiante.find({ country: { $in: [“United States”,
+    “Canada”] } })
+
+-   Devuelve los documentos cuyo país esté dentro de la lista indicada.
+
+9. Agregación: Contar por tipo: db.estudiante.aggregate([ {
+    $group: { _id: "$type”, total: { $sum: 1 } } }])
+
+-   Cuenta cuántas películas y series existen agrupadas por su tipo.
+
+10. Agregación: Promedio del año de lanzamiento:
+    db.estudiante.aggregate([ { $group: { _id: null, promedioAnio: {
+    $avg: "$release_year” } } }])
+
+-   Calcula el año promedio de lanzamiento de todo el catálogo.
+
+11. Agregación: Top 5 países con más contenido:
+    db.estudiante.aggregate([ { $group: { _id: "$country”, total: {
+    $sum: 1 } } }, { $sort: { total: -1 } }, { $limit: 5 }])
+
+-   Muestra los 5 países que más producciones tienen en el catálogo.
+
+12. Agregación: Categorías más frecuentes: db.estudiante.aggregate([ {
+    $group: { _id: "$listed_in”, total: { $sum: 1 } } }, { $sort: {
+    total: -1 } }, { $limit: 10 }])
+
+-   Identifica las categorías o géneros con mayor cantidad de contenido.
